@@ -1,16 +1,17 @@
-import platform from "platform";
-import Windows from "./windows";
-import Linux from "./linux";
-import Mac from "./mac";
+import dynamic from 'next/dynamic';
+import { window } from "browser-monads";
+
+const { userAgent } = window.navigator;
+
+const DynamicBSOD = dynamic(
+  () => userAgent.includes("Windows") ? import('./windows') : userAgent.includes("Mac") ? import('./mac') : import('./linux'),
+  { ssr: false }
+)
 
 export const BSOD = (): JSX.Element => {
-  let Screen = Linux;
-  if (platform.os.family.includes("Windows")) Screen = Windows;
-  else if (platform.os.family.includes("Mac")) Screen = Mac;
-
   return (
     <>
-      <Screen />
+      <DynamicBSOD />
 
       <style jsx global>{`
         .fullscreen {
